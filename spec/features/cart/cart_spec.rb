@@ -214,7 +214,7 @@ end
 RSpec.describe CartController, type: :controller do
   it 'redirects back to where you came from if you try to add an invalid item id to cart' do
     item = create(:item)
-    put :add, params: {id: (item.id + 1)}
+    put :add, params: {slug: (item.id + 1)}
     expect(response.request.env['action_dispatch.request.flash_hash'].to_h['error']).to eq('Cannot add that item')
     expect(response.status).to eq(302)
     expect(response.header['Location']).to include(items_path)

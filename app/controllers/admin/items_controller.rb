@@ -1,6 +1,6 @@
 class Admin::ItemsController < Admin::BaseController
   before_action :set_merchant
-  
+
   def index
     @items = @merchant.items
     render :'/merchants/items/index'
@@ -14,7 +14,7 @@ class Admin::ItemsController < Admin::BaseController
   end
 
   def edit
-    @item = Item.find(params[:id])
+    @item = Item.find_by(slug: params[:item_slug])
     @form_path = [:admin, @merchant, @item]
 
     render "/merchants/items/edit"

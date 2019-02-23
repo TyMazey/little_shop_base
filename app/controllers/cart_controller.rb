@@ -1,5 +1,6 @@
 class CartController < ApplicationController
   before_action :visitor_or_user
+  before_action :set_item_id, only: [:add, :remove_all_of_item, :add_more_item, :remove_more_item]
   include ActionView::Helpers::TextHelper
 
   def show
@@ -12,29 +13,29 @@ class CartController < ApplicationController
   end
 
   def add
-    add_item_to_cart(params[:id])
+    add_item_to_cart(@item)
     redirect_to items_path
   end
 
   def remove_all_of_item
-    remove_item(params[:id])
+    remove_item(@item)
     redirect_to cart_path
   end
 
   def add_more_item
-    add_item_to_cart(params[:id])
+    add_item_to_cart(@item)
     redirect_to cart_path
   end
 
   def remove_more_item
-    remove_item(params[:id], 1)
+    remove_item(@item, 1)
     redirect_to cart_path
   end
 
   private
 
-  def remove_item(item_id, count=nil)
-    item = Item.find(params[:id])
+  def remove_item(item, count=nil)
+    item = Item.find(item.id)
     if count.nil?
       @cart.remove_all_of_item(item.id)
       flash[:success] = "You have removed all packages of #{item.name} from your cart"
@@ -45,13 +46,18 @@ class CartController < ApplicationController
     session[:cart] = @cart.contents
   end
 
-  def add_item_to_cart(item_id)
-    if item = Item.where(id: item_id).first
+  def add_item_to_cart(item)
+    if item
+      item = Item.where(id: item.id).first
       @cart.add_item(item.id)
       flash[:success] = "You have #{pluralize(@cart.count_of(item.id), 'package')} of #{item.name} in your cart"
       session[:cart] = @cart.contents
     else
       flash[:error] = 'Cannot add that item'
     end
+  end
+
+  def set_item_id
+    @item = Item.find_by(slug: params[:slug])
   end
 end

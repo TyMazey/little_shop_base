@@ -52,7 +52,7 @@ class Item < ApplicationRecord
   end
 
   def name_kebab_case
-    self.name.gsub(' ', '-')
+    self.name.gsub(' ', '-').downcase
   end
 
   def to_param

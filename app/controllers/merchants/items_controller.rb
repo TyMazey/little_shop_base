@@ -1,5 +1,6 @@
 class Merchants::ItemsController < ApplicationController
   before_action :merchant_or_admin, only: [:index]
+  before_action :set_item
 
   def index
     @items = Item.where(user: current_user)
@@ -14,7 +15,6 @@ class Merchants::ItemsController < ApplicationController
   end
 
   def destroy
-    @item = Item.find(params[:id])
     merchant = @item.user
     if @item && @item.ever_ordered?
       flash[:error] = "Attempt to delete #{@item.name} was thwarted!"
@@ -34,7 +34,6 @@ class Merchants::ItemsController < ApplicationController
   end
 
   def edit
-    @item = Item.find(params[:id])
     @form_path = [:dashboard, @item]
   end
 
@@ -71,7 +70,6 @@ class Merchants::ItemsController < ApplicationController
     if current_admin?
       @merchant = User.find_by(email: params[:slug])
     end
-    @item = Item.find(params[:id])
 
     ip = item_params
     if ip[:image].empty?
@@ -103,13 +101,16 @@ class Merchants::ItemsController < ApplicationController
   end
 
   def set_item_active(state)
-    item = Item.find(params[:id])
-    item.active = state
-    item.save
+    @item.active = state
+    @item.save
     if current_admin?
-      redirect_to admin_merchant_items_path(item.user)
+      redirect_to admin_merchant_items_path(@item.user)
     else
       redirect_to dashboard_items_path
     end
+  end
+
+  def set_item
+    @item = Item.find_by(slug: params[:item_slug])
   end
 end
