@@ -9,6 +9,14 @@ RSpec.describe Item, type: :model do
     it { should validate_presence_of :inventory }
     it { should validate_numericality_of(:inventory).only_integer }
     it { should validate_numericality_of(:inventory).is_greater_than_or_equal_to(0) }
+    it 'creates a slug based on the name of the item when created/saved' do
+      item = Item.create(name: 'slug item', price: 10, description: 'slug', inventory: 10)
+      expect(item.slug).to eq('slug-item')
+      item.update(name: 'still a slug')
+      expect(item.slug).to eq('still-a-slug')
+      item_2 = Item.create(name: 'still a slug', price: 10, description: 'slug', inventory: 10)
+      expect(item_2.slug).to eq("still-a-slug-#{@item_2.id}")
+    end
   end
 
   describe 'relationships' do
