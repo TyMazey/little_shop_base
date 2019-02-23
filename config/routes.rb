@@ -43,14 +43,14 @@ Rails.application.routes.draw do
     put '/users/:user_slug/enable', to: 'users#enable', as: :enable_user
     put '/users/:user_slug/disable', to: 'users#disable', as: :disable_user
     put '/users/:user_slug/upgrade', to: 'users#upgrade', as: :upgrade_user
-    resources :users, only: [:index, :show, :edit, :update], param: :slug do
+    resources :users, only: [:index, :show, :edit, :update], param: :slug, constraints: { slug: /[0-z\.]+/ } do
       resources :orders, only: [:index, :show]
     end
 
     put '/merchants/:merchant_slug/downgrade', to: 'merchants#downgrade', as: :downgrade_merchant
     patch '/merchants/:merchant_slug/enable', to: 'merchants#enable', as: :enable_merchant
     patch '/merchants/:merchant_slug/disable', to: 'merchants#disable', as: :disable_merchant
-    resources :merchants, only: [:show], param: :slug do
+    resources :merchants, only: [:show], param: :slug, constraints: { slug: /[0-z\.]+/ } do
       get '/orders/:id', to: 'orders#merchant_show', as: :order
       resources :items, only: [:index, :edit, :new]
     end
