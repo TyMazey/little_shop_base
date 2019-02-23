@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  before_validation :set_slug, on: :create
+  before_save :set_slug
   has_secure_password
 
   enum role: [:default, :merchant, :admin]
@@ -147,4 +149,14 @@ class User < ApplicationRecord
          .order('total DESC')
          .limit(limit)
   end
+  def to_param
+    slug
+  end
+
+  private
+
+  def set_slug
+    self.slug = self.email
+  end
+
 end

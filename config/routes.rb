@@ -14,7 +14,7 @@ Rails.application.routes.draw do
     resources :orders, only: [:index, :create, :show, :destroy]
   end
 
-  resources :users, only: [:create, :update]
+  resources :users, only: [:create, :update], param: :slug
 
   get '/cart', to: 'cart#show'
   post '/cart/item/:id', to: 'cart#add', as: :cart_item
@@ -34,23 +34,23 @@ Rails.application.routes.draw do
     put '/order_items/:id', to: 'merchants/order_items#update', as: :fulfill_order_item
   end
 
-  resources :merchants, only: [:index, :show]
+  resources :merchants, only: [:index, :show], param: :slug
 
-  post '/admin/users/:merchant_id/items', to: 'merchants/items#create', as: 'admin_user_items'
-  patch '/admin/users/:merchant_id/items/:id', to: 'merchants/items#update', as: 'admin_user_item'
+  post '/admin/users/:merchant_slug/items', to: 'merchants/items#create', as: 'admin_user_items'
+  patch '/admin/users/:merchant_slug/items/:id', to: 'merchants/items#update', as: 'admin_user_item'
 
   namespace :admin do
-    put '/users/:id/enable', to: 'users#enable', as: :enable_user
-    put '/users/:id/disable', to: 'users#disable', as: :disable_user
-    put '/users/:id/upgrade', to: 'users#upgrade', as: :upgrade_user
-    resources :users, only: [:index, :show, :edit, :update] do
+    put '/users/:user_slug/enable', to: 'users#enable', as: :enable_user
+    put '/users/:user_slug/disable', to: 'users#disable', as: :disable_user
+    put '/users/:user_slug/upgrade', to: 'users#upgrade', as: :upgrade_user
+    resources :users, only: [:index, :show, :edit, :update], param: :slug do
       resources :orders, only: [:index, :show]
     end
 
-    put '/merchants/:id/downgrade', to: 'merchants#downgrade', as: :downgrade_merchant
-    patch '/merchants/:id/enable', to: 'merchants#enable', as: :enable_merchant
-    patch '/merchants/:id/disable', to: 'merchants#disable', as: :disable_merchant
-    resources :merchants, only: [:show] do
+    put '/merchants/:merchant_slug/downgrade', to: 'merchants#downgrade', as: :downgrade_merchant
+    patch '/merchants/:merchant_slug/enable', to: 'merchants#enable', as: :enable_merchant
+    patch '/merchants/:merchant_slug/disable', to: 'merchants#disable', as: :disable_merchant
+    resources :merchants, only: [:show], param: :slug do
       get '/orders/:id', to: 'orders#merchant_show', as: :order
       resources :items, only: [:index, :edit, :new]
     end
