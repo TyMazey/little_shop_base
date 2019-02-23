@@ -55,6 +55,10 @@ class Item < ApplicationRecord
     self.name.gsub(' ', '-')
   end
 
+  def to_param
+    slug
+  end
+
   private
 
   def set_slug

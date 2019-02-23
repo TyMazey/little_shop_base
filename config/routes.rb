@@ -23,7 +23,7 @@ Rails.application.routes.draw do
   delete '/cart/item/:id', to: 'cart#remove_more_item', as: :cart_remove_more_item
   delete '/cart/item/:id/all', to: 'cart#remove_all_of_item', as: :cart_remove_item_all
 
-  resources :items, only: [:index, :show]
+  resources :items, only: [:index, :show], param: :slug
 
   scope :dashboard, as: :dashboard do
     get '/', to: 'merchants#show'
