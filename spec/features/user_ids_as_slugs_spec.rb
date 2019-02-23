@@ -25,5 +25,12 @@ RSpec.describe 'as a registered user/merchant/admin' do
 
       expect(current_path).to eq("/admin/users/#{@user.email}")
     end
+
+    it "shows slug when viewing a merchants items" do
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@admin)
+
+      visit admin_merchant_items_path(@merchant)
+      expect(current_path).to eq("/admin/merchants/#{@merchant.email}/items")
+    end
   end
 end
