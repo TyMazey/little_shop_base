@@ -12,6 +12,6 @@ RSpec.describe 'as a registered user/merchant/admin' do
 
     visit merchant_path(@merchant)
 
-    expect(current_path).to eq("merchants/#{@merchant.email}")
+    expect(current_path).to eq("/merchants/#{@merchant.email}")
   end
 end
