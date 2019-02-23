@@ -1,4 +1,6 @@
 class Item < ApplicationRecord
+  before_validation :set_slug, on: :create
+  before_save :update_slug, if: :name_changed?
   belongs_to :user, foreign_key: 'merchant_id'
   has_many :order_items
   has_many :orders, through: :order_items
@@ -12,6 +14,7 @@ class Item < ApplicationRecord
     only_integer: true,
     greater_than_or_equal_to: 0
   }
+  validates_uniqueness_of :slug
 
   def avg_time_to_fulfill
     data = Item.joins(:order_items)
@@ -47,4 +50,29 @@ class Item < ApplicationRecord
       .where(fulfilled: true, orders: {status: :completed}, item_id: self.id)
       .count > 0
   end
+
+  def name_kebab_case
+    self.name.gsub(' ', '-')
+  end
+
+  private
+
+  def set_slug
+    if name
+      if Item.exists?(name: self.name)
+        self.slug = self.name_kebab_case + (Item.last.id + 1).to_s
+      else
+        self.slug = self.name_kebab_case
+      end
+    end
+  end
+
+  def update_slug
+    if Item.exists?(name: self.name)
+      self.slug = self.name_kebab_case + "-" + (Item.last.id + 1).to_s
+    else
+      self.slug = self.name_kebab_case
+    end
+  end
+
 end
