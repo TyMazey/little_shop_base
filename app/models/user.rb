@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  before_validation :set_slug, on: :create
+  before_save :set_slug
   has_secure_password
 
   enum role: [:default, :merchant, :admin]
@@ -72,7 +74,7 @@ class User < ApplicationRecord
   def top_items_sold_by_quantity(limit)
     items.joins(:order_items)
          .where(order_items: {fulfilled: true})
-         .select('items.id, items.name, sum(order_items.quantity) as quantity')
+         .select('items.id, items.name, items.slug, sum(order_items.quantity) as quantity')
          .group(:id)
          .order('quantity DESC, id')
          .limit(limit)
@@ -147,4 +149,14 @@ class User < ApplicationRecord
          .order('total DESC')
          .limit(limit)
   end
+  def to_param
+    slug
+  end
+
+  private
+
+  def set_slug
+    self.slug = self.email
+  end
+
 end

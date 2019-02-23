@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190210231817) do
+ActiveRecord::Schema.define(version: 20190223210713) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(version: 20190210231817) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "merchant_id"
+    t.string "slug"
     t.index ["merchant_id"], name: "index_items_on_merchant_id"
   end
 
@@ -60,6 +61,7 @@ ActiveRecord::Schema.define(version: 20190210231817) do
     t.string "zip"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "slug"
     t.index ["city"], name: "index_users_on_city"
     t.index ["email"], name: "index_users_on_email"
     t.index ["state"], name: "index_users_on_state"

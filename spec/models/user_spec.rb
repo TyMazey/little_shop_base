@@ -9,6 +9,12 @@ RSpec.describe User, type: :model do
     it { should validate_presence_of :city }
     it { should validate_presence_of :state }
     it { should validate_presence_of :zip }
+    it 'adds a slug when the user is created or updated email' do
+      user = User.create(email: 'slug@slug.com', name: 'slug', address: 'slug', city: 'slug', state: 'slug', zip: 10101)
+      expect(user.slug).to eq('slug@slug.com')
+      user.update(email: 'stillslug@slug.com')
+      expect(user.slug).to eq('stillslug@slug.com')
+    end
   end
 
   describe 'relationships' do
