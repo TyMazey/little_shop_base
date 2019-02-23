@@ -46,7 +46,7 @@ class Merchants::ItemsController < ApplicationController
     ip[:active] = true
     @merchant = current_user
     if current_admin?
-      @merchant = User.find(params[:merchant_id])
+      @merchant = User.find_by(email: params[:slug])
     end
     @item = @merchant.items.create(ip)
     if @item.save
@@ -69,7 +69,7 @@ class Merchants::ItemsController < ApplicationController
   def update
     @merchant = current_user
     if current_admin?
-      @merchant = User.find(params[:merchant_id])
+      @merchant = User.find_by(email: params[:slug])
     end
     @item = Item.find(params[:id])
 
