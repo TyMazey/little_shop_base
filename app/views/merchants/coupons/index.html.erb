@@ -1,0 +1,14 @@
+<h1>Your Coupons</h1>
+<% if @coupons.count < 5 %>
+  <%= link_to 'Add New Coupon', new_dashboard_coupon_path %>
+<% else %>
+  <p>Youve reached your limit for Coupons.</p>
+<% end %>
+<section class="coupons">
+  <% @coupons.each do |c| %>
+    <div id="coupon-<%= c.id %>">
+      <p><%= c.name %></p>
+      <%= link_to 'Edit Coupon', edit_dashboard_coupon_path(c) %>
+    </div>
+  <% end %>
+</section>

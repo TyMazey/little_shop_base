@@ -89,5 +89,11 @@ RSpec.describe 'merchant dashboard' do
         expect(current_path).to eq(admin_merchant_items_path(@merchant))
       end
     end
+
+    it 'gives me a link to manage my coupons' do
+      click_link('Manage Coupons')
+      
+      expect(current_path).to eq(dashboard_coupons_path)
+    end
   end
 end
