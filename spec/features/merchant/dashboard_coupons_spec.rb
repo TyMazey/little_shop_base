@@ -124,4 +124,28 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
 
     expect(page).to have_content("Cannot Delete Coupon, it has been previously used.")
   end
+
+  it 'allows me to disable coupons' do
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+    visit dashboard_coupons_path
+    within "#coupon-#{@coupon_1.id}" do
+      click_button 'Disable Coupon'
+      expect(page).to_not have_button('Enable Coupon')
+    end
+    disabled = Coupon.find(@coupon_1.id)
+    expect(disabled.status).to eq('disabled')
+  end
+
+  it 'allows me to enable coupons' do
+    disabled = Coupon.create(name: 'coup', coupon_type: 0, value: 20, user: @merchant, status: 1)
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+    visit dashboard_coupons_path
+    within "#coupon-#{disabled.id}" do
+      click_button 'Enable Coupon'
+      expect(page).to_not have_button('Disable Coupon')
+    end
+    enabled = Coupon.find(@coupon_1.id)
+    expect(enabled.status).to eq('enabled')
+  end
+
 end

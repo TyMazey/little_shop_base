@@ -9,10 +9,10 @@ class Coupon < ApplicationRecord
   validates_presence_of :value
   validates :value, numericality: { greater_than: 0 }
 
-  enum coupon: [:dollar_off, :percent_off]
+  enum coupon: [:dollars_off, :percent_off]
   enum status: [:enabled, :disabled]
 
   def used?
-    Order.any? {|o| o.coupon_id = id } 
+    Order.any? {|o| o.coupon_id = id }
   end
 end

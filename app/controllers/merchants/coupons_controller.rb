@@ -53,8 +53,24 @@ class Merchants::CouponsController < ApplicationController
     redirect_to dashboard_coupons_path
   end
 
+  def disable
+    coupon = Coupon.find(params[:id])
+    set_coupon_status(coupon, 1)
+  end
+
+  def enable
+    coupon = Coupon.find(params[:id])
+    set_coupon_status(coupon, 0)
+  end
+
   private
   def coupon_params
     params.require(:coupon).permit(:name, :coupon_type, :value)
+  end
+
+  def set_coupon_status(coupon, status)
+    coupon.status = status
+    coupon.save
+    redirect_to dashboard_coupons_path
   end
 end

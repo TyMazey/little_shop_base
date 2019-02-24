@@ -29,6 +29,8 @@ Rails.application.routes.draw do
     get '/', to: 'merchants#show'
     resources :items, module: :merchants, param: :item_slug
     resources :coupons, module: :merchants
+    put 'coupons/:id/enable', to: 'merchants/coupons#enable', as: :enable_coupon
+    put 'coupons/:id/disable', to: 'merchants/coupons#disable', as: :disable_coupon
     put '/items/:item_slug/enable', to: 'merchants/items#enable', as: :enable_item
     put '/items/:item_slug/disable', to: 'merchants/items#disable', as: :disable_item
     get '/orders/:id', to: 'merchants/orders#show', as: :order
