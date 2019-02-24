@@ -101,4 +101,27 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
 
       expect(page).to have_content("Edited Coupon")
   end
+
+  it 'allows me to delete a coupon that has not been used' do
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+    visit dashboard_coupons_path
+
+    within "#coupon-#{@coupon_1.id}" do
+      click_button 'Delete Coupon'
+    end
+
+    expect(page).to_not have_content("#{@coupon_1.name}")
+  end
+
+  it 'does not allow me to delete a coupon that has not been used' do
+    order = create(:order, coupon_id: @coupon_1.id)
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+    visit dashboard_coupons_path
+
+    within "#coupon-#{@coupon_1.id}" do
+      click_button 'Delete Coupon'
+    end
+
+    expect(page).to have_content("Cannot Delete Coupon, it has been previously used.")
+  end
 end

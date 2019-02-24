@@ -9,6 +9,7 @@
     <div id="coupon-<%= c.id %>">
       <p><%= c.name %></p>
       <%= link_to 'Edit Coupon', edit_dashboard_coupon_path(c) %>
+      <%= button_to 'Delete Coupon', dashboard_coupon_path(c), method: :delete %>
     </div>
   <% end %>
 </section>

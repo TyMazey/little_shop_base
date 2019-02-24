@@ -11,4 +11,8 @@ class Coupon < ApplicationRecord
 
   enum coupon: [:dollar_off, :percent_off]
   enum status: [:enabled, :disabled]
+
+  def used?
+    Order.any? {|o| o.coupon_id = id } 
+  end
 end

@@ -43,6 +43,16 @@ class Merchants::CouponsController < ApplicationController
     end
   end
 
+  def destroy
+    coupon = Coupon.find(params[:id])
+    if coupon && coupon.used?
+      flash[:error] = "Cannot Delete Coupon, it has been previously used."
+    elsif coupon
+      coupon.destroy
+    end
+    redirect_to dashboard_coupons_path
+  end
+
   private
   def coupon_params
     params.require(:coupon).permit(:name, :coupon_type, :value)
