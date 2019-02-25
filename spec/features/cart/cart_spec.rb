@@ -325,6 +325,25 @@ RSpec.describe 'cart workflow', type: :feature do
       expect(page).to have_content('Total: $3.00')
       expect(page).to have_content('Total After Discount: $1.50')
     end
+
+    scenario 'as a registered user i cant use coupons again on different orders' do
+      user = create(:user)
+      order = create(:order, user: user, coupon_id: @dollar_off_coupon.id)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 1'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Sorry You Have Already Used That Coupon.')
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $3.00')
+    end
   end
 end
 

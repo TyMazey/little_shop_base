@@ -33,10 +33,15 @@ class CartController < ApplicationController
   end
 
   def add_coupon
-    @cart.add_coupon_to_cart(params[:coupon])
-    flash[:success] = "You have added the coupon to your order."
-    session[:coupon] = @cart.coupon
-    redirect_to cart_path
+    if current_user.used_coupon?(params[:coupon])
+      flash[:error] = "Sorry You Have Already Used That Coupon."
+      redirect_to cart_path
+    else
+      @cart.add_coupon_to_cart(params[:coupon])
+      flash[:success] = "You have added the coupon to your order."
+      session[:coupon] = @cart.coupon
+      redirect_to cart_path
+    end
   end
 
   private
