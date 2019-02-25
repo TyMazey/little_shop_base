@@ -22,6 +22,7 @@ Rails.application.routes.draw do
   delete '/cart', to: 'cart#destroy', as: :cart_empty
   delete '/cart/item/:slug', to: 'cart#remove_more_item', as: :cart_remove_more_item
   delete '/cart/item/:slug/all', to: 'cart#remove_all_of_item', as: :cart_remove_item_all
+  post '/cart/coupon', to: 'cart#add_coupon', as: :cart_coupon
 
   resources :items, only: [:index, :show], param: :slug
 

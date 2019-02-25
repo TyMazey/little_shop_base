@@ -32,6 +32,13 @@ class CartController < ApplicationController
     redirect_to cart_path
   end
 
+  def add_coupon
+    @cart.add_coupon_to_cart(params[:coupon])
+    flash[:success] = "You have added the coupon to your order."
+    session[:coupon] = @cart.coupon
+    redirect_to cart_path
+  end
+
   private
 
   def remove_item(item, count=nil)
@@ -60,4 +67,5 @@ class CartController < ApplicationController
   def set_item_id
     @item = Item.find_by(slug: params[:slug])
   end
+
 end

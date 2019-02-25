@@ -27,7 +27,7 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
     expect(current_path).to eq(new_dashboard_coupon_path)
 
     fill_in 'Name', with: 'New Coupon'
-    select 'Dollar Off', from: 'Coupon type'
+    select 'Dollars Off', from: 'Coupon type'
     fill_in 'Value', with: '25'
     click_button 'Save Coupon'
 
@@ -46,7 +46,7 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
     expect(current_path).to eq(new_dashboard_coupon_path)
 
     fill_in 'Name', with: 'Coupon Name 1'
-    select 'Dollar Off', from: 'Coupon type'
+    select 'Dollars Off', from: 'Coupon type'
     fill_in 'Value', with: '25'
     click_button 'Save Coupon'
 
@@ -60,7 +60,7 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
     expect(current_path).to eq(new_dashboard_coupon_path)
 
     fill_in 'Name', with: 'New Coupon'
-    select 'Dollar Off', from: 'Coupon type'
+    select 'Dollars Off', from: 'Coupon type'
     fill_in 'Value', with: '0'
     click_button 'Save Coupon'
 
@@ -78,7 +78,7 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
 
     visit new_dashboard_coupon_path
     fill_in 'Name', with: 'New Coupon'
-    select 'Dollar Off', from: 'Coupon type'
+    select 'Dollars Off', from: 'Coupon type'
     fill_in 'Value', with: '25'
     click_button 'Save Coupon'
 
@@ -95,7 +95,7 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
       expect(current_path).to eq(edit_dashboard_coupon_path(@coupon_1))
 
       fill_in 'Name', with: 'Edited Coupon'
-      select 'Dollar Off', from: 'Coupon type'
+      select 'Dollars Off', from: 'Coupon type'
       fill_in 'Value', with: '30'
       click_button 'Save Coupon'
 

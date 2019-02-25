@@ -9,7 +9,7 @@ class Coupon < ApplicationRecord
   validates_presence_of :value
   validates :value, numericality: { greater_than: 0 }
 
-  enum coupon: [:dollars_off, :percent_off]
+  enum coupon_type: [:dollars_off, :percent_off]
   enum status: [:enabled, :disabled]
 
   def used?

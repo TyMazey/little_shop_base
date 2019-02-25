@@ -1,5 +1,5 @@
 class Cart
-  attr_reader :contents
+  attr_reader :contents, :coupon
 
   def initialize(initial_contents)
     @contents = initial_contents || Hash.new(0)
@@ -42,5 +42,40 @@ class Cart
     @contents.keys.map do |item_id|
       subtotal(item_id)
     end.sum
+  end
+
+  def discounted_total
+    if @coupon
+      coupon = Coupon.find_by(name: @coupon)
+      if coupon.dollars_off?
+        total = subtotal_for_coupon_items - coupon.value
+      elsif coupon.percent_off?
+        total =subtotal_for_coupon_items - (subtotal_for_coupon_items * ( coupon.value.to_f / 100.00))
+      end
+      if total < 0
+        total = 0
+      else
+        total
+      end 
+    else
+      grand_total
+    end
+  end
+
+  def items_for_coupon
+    if @coupon
+      c = Coupon.find_by(name: @coupon)
+      Item.where(merchant_id: c.user_id, id: @contents.keys).pluck(:id)
+    end
+  end
+
+  def subtotal_for_coupon_items
+    items_for_coupon.map do |item_id|
+      subtotal(item_id)
+    end.sum
+  end
+
+  def add_coupon_to_cart(coupon)
+    @coupon = coupon
   end
 end
