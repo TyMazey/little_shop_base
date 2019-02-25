@@ -7,7 +7,12 @@ class Profile::OrdersController < ApplicationController
   end
 
   def create
-    order = Order.create(user: current_user, status: :pending)
+    if @cart.coupon
+      coupon_id = Coupon.find_by(name: @cart.coupon).id
+      order = Order.create(user: current_user, status: :pending, discounted_total: @cart.discounted_total, coupon_id: coupon_id)
+    else
+      order = Order.create(user: current_user, status: :pending)
+    end
     @cart.items.each do |item|
       order.order_items.create!(
         item: item,
@@ -23,6 +28,9 @@ class Profile::OrdersController < ApplicationController
 
   def show
     @order = Order.find(params[:id])
+    if @order.coupon_id
+      @coupon = Coupon.find(@order.coupon_id)
+    end
   end
 
   def destroy

@@ -5,6 +5,10 @@
   <p>Status: <%= @order.status %></p>
   <p>Item Count: <%= @order.total_item_count %></p>
   <p>Total Cost: <%= number_to_currency(@order.total_cost) %></p>
+  <% if @order.discounted_total %>
+    <p>Total After Discount: <%= number_to_currency(@order.discounted_total) %></p>
+    <p>Coupon Used: <%= @coupon.name %></p>
+  <% end %>
 
   <% if @order.status == 'pending' %>
   <p><%= button_to 'Cancel Order', profile_order_path(@order), method: :delete %></p>
