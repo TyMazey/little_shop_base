@@ -151,8 +151,8 @@ class User < ApplicationRecord
          .limit(limit)
   end
 
-  def used_coupon?(coupon_id)
-    Order.where(coupon_id: coupon_id).any? { |order| order.user_id == id }
+  def used_coupon?(coupon_name)
+    Order.joins(:coupon).where(coupons: {name: coupon_name}).any? { |order| order.user_id == id }
   end
 
   def to_param

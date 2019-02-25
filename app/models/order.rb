@@ -2,7 +2,7 @@ class Order < ApplicationRecord
   enum status: [:pending, :completed, :cancelled]
 
   belongs_to :user
-  belongs_to :order, optional: true
+  belongs_to :coupon, optional: true
   has_many :order_items
   has_many :items, through: :order_items
 

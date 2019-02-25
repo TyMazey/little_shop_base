@@ -217,8 +217,8 @@ RSpec.describe User, type: :model do
     end
 
     it '.use_coupon?' do
-      expect(@u1.used_coupon?(@used_coupon.id)).to eq(true)
-      expect(@u1.used_coupon?(@unused_coupon.id)).to eq(false)
+      expect(@u1.used_coupon?(@used_coupon.name)).to eq(true)
+      expect(@u1.used_coupon?(@unused_coupon.name)).to eq(false)
     end
   end
 end
