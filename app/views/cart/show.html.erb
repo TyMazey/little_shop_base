@@ -4,7 +4,7 @@
   <p>Your cart is empty</p>
 <% else %>
   Total: <%= number_to_currency(@cart.grand_total) %>
-  Discounted Total: <%= number_to_currency(@cart.discounted_total) %>
+  Total After Discount: <%= number_to_currency(@cart.discounted_total) %>
   <%= button_to "Empty cart", cart_empty_path, method: :delete %>
   <div class="coupon-code">
     <%= form_tag cart_coupon_path do %>

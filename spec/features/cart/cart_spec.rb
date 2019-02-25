@@ -230,7 +230,7 @@ RSpec.describe 'cart workflow', type: :feature do
       end
 
       expect(page).to have_content('Total: $3.00')
-      expect(page).to have_content('Discounted Total: $2.00')
+      expect(page).to have_content('Total After Discount: $2.00')
     end
 
     scenario 'as a registered user using a percent off coupon' do
@@ -250,8 +250,30 @@ RSpec.describe 'cart workflow', type: :feature do
       end
 
       expect(page).to have_content('Total: $3.00')
-      expect(page).to have_content('Discounted Total: $1.50')
+      expect(page).to have_content('Total After Discount: $1.50')
     end
+
+    scenario 'as a registered user the coupon does not go into negitives' do
+      hundred_dollars_off = create(:coupon, coupon_type: 0, value: 100, user: @merchant)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 3'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $0')
+    end
+
     scenario 'coupons only affect items for the merchant who made the coupon' do
       merchant_2 = create(:merchant)
       item_2 = create(:item, user: merchant_2)
@@ -273,7 +295,7 @@ RSpec.describe 'cart workflow', type: :feature do
       end
 
       expect(page).to have_content('Total: $7.50')
-      expect(page).to have_content('Discounted Total: $6.50')
+      expect(page).to have_content('Total After Discount: $6.50')
     end
   end
 end
