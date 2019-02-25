@@ -344,6 +344,43 @@ RSpec.describe 'cart workflow', type: :feature do
       expect(page).to have_content('Total: $3.00')
       expect(page).to have_content('Total After Discount: $3.00')
     end
+
+    scenario 'as a registered user i cant use disbled coupons' do
+      disbled_coupon = create(:coupon, coupon_type: 0, value: 1, status: 1, user: @merchant)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 3'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Sorry That Coupon Does Not Exist.')
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $3.00')
+    end
+
+    scenario 'as a registered user i cant use a coupon that does not exsist' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'not a real coupon'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Sorry That Coupon Does Not Exist.')
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $3.00')
+    end
   end
 end
 
