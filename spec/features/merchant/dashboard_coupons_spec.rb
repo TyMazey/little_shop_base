@@ -99,7 +99,24 @@ RSpec.describe 'Mechant Dashboard Coupons Page', type: :feature do
       fill_in 'Value', with: '30'
       click_button 'Save Coupon'
 
-      expect(page).to have_content("Edited Coupon")
+      expect(page).to have_content("You have edited coupon Edited Coupon successfully!")
+  end
+
+  it 'does not let me edit a coupon with missing information' do
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(@merchant)
+    visit dashboard_coupons_path
+
+    within "#coupon-#{@coupon_1.id}" do
+      click_link 'Edit Coupon'
+    end
+      expect(current_path).to eq(edit_dashboard_coupon_path(@coupon_1))
+
+      fill_in 'Name', with: 'Edited Coupon'
+      select 'Dollars Off', from: 'Coupon type'
+      fill_in 'Value', with: ''
+      click_button 'Save Coupon'
+
+      expect(page).to_not have_content("You have edited coupon Edited Coupon successfully!")
   end
 
   it 'allows me to delete a coupon that has not been used' do

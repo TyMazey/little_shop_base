@@ -14,4 +14,16 @@ RSpec.describe Coupon, type: :model do
     it {should belong_to :user}
     it {should have_many :orders}
   end
+
+  describe 'instance methods' do
+    it '.used?' do
+      user = create(:user)
+      coupon = create(:coupon, coupon_type: 0, value: 100, user: user)
+
+      expect(coupon.used?).to eq(false)
+
+      order = create(:order, coupon_id: coupon.id)
+      expect(coupon.used?).to eq(true)
+    end
+  end
 end

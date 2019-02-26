@@ -66,6 +66,12 @@ class Cart
     end
   end
 
+  def subtotal_for_coupon_items
+    items_for_coupon.map do |item_id|
+      subtotal(item_id)
+    end.sum
+  end
+  
   def non_applied_coupon_total
     items_not_for_coupon.map do |item_id|
       subtotal(item_id)
@@ -82,11 +88,6 @@ class Cart
     Item.where.not(merchant_id: c.user_id).where(id: @contents.keys).pluck(:id)
   end
 
-  def subtotal_for_coupon_items
-    items_for_coupon.map do |item_id|
-      subtotal(item_id)
-    end.sum
-  end
 
   def add_coupon_to_cart(coupon)
     @coupon = coupon
