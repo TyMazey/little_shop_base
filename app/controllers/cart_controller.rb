@@ -35,7 +35,7 @@ class CartController < ApplicationController
   def add_coupon
     coupon = Coupon.find_by(name: params[:coupon])
     if coupon
-      if current_user.used_coupon?(coupon.name)
+      if current_user.used_coupon?(coupon.id)
         flash[:error] = "Sorry You Have Already Used That Coupon."
         redirect_to cart_path
       elsif coupon.disabled?
