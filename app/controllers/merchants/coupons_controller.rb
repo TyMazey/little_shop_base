@@ -28,7 +28,12 @@ class Merchants::CouponsController < ApplicationController
 
   def edit
     coupon = Coupon.find(params[:id])
-    @form_path = [:dashboard, coupon]
+    if coupon && coupon.used?
+      flash[:error] = "Cannot Edit Coupon, it has been previously used."
+      redirect_to dashboard_coupons_path
+    elsif coupon
+      @form_path = [:dashboard, coupon]
+    end
   end
 
   def update
