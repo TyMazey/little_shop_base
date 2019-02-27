@@ -9,6 +9,12 @@ RSpec.describe User, type: :model do
     it { should validate_presence_of :city }
     it { should validate_presence_of :state }
     it { should validate_presence_of :zip }
+    it 'adds a slug when the user is created or updated email' do
+      user = User.create(email: 'slug@slug.com', name: 'slug', address: 'slug', city: 'slug', state: 'slug', zip: 10101)
+      expect(user.slug).to eq('slug@slug.com')
+      user.update(email: 'stillslug@slug.com')
+      expect(user.slug).to eq('stillslug@slug.com')
+    end
   end
 
   describe 'relationships' do
@@ -140,6 +146,9 @@ RSpec.describe User, type: :model do
       @oi5.fulfill
       @oi6.fulfill
       @oi7.fulfill
+      @used_coupon = create(:coupon, coupon_type: 0, value: 1, user: @m1)
+      @unused_coupon = create(:coupon, coupon_type: 0, value: 1, user: @m1)
+      @order_w_coupon = create(:completed_order, user: @u1, coupon_id: @used_coupon.id)
     end
 
     it '.top_items_sold_by_quantity' do
@@ -205,6 +214,11 @@ RSpec.describe User, type: :model do
       expect(@m1.top_users_by_money_spent(3)[1].total).to eq(36.0)
       expect(@m1.top_users_by_money_spent(3)[2].name).to eq(@u1.name)
       expect(@m1.top_users_by_money_spent(3)[2].total).to eq(33.0)
+    end
+
+    it '.use_coupon?' do
+      expect(@u1.used_coupon?(@used_coupon.id)).to eq(true)
+      expect(@u1.used_coupon?(@unused_coupon.id)).to eq(false)
     end
   end
 end

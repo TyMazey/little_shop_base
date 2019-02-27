@@ -5,6 +5,8 @@ include ActionView::Helpers::NumberHelper
 RSpec.describe 'cart workflow', type: :feature do
   before :each do
     @merchant = create(:merchant)
+    @dollar_off_coupon = create(:coupon, coupon_type: 0, value: 1, user: @merchant)
+    @percent_off_coupon = create(:coupon, coupon_type: 1, value: 50, user: @merchant)
     @item = create(:item, user: @merchant)
   end
 
@@ -209,12 +211,234 @@ RSpec.describe 'cart workflow', type: :feature do
       expect(page).to_not have_button("Add to cart")
     end
   end
+
+  describe 'users can add coupons to their order at the cart' do
+    scenario 'as a registered user using a dollar off coupon' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 1'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $2.00')
+    end
+
+    scenario 'as a registered user using a percent off coupon' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 2'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $1.50')
+    end
+
+    scenario 'as a registered user the coupon does not go into negitives' do
+      hundred_dollars_off = create(:coupon, coupon_type: 0, value: 100, user: @merchant)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 3'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $0')
+    end
+
+    scenario 'coupons only affect items for the merchant who made the coupon' do
+      merchant_2 = create(:merchant)
+      item_2 = create(:item, user: merchant_2)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit item_path(item_2)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 1'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $7.50')
+      expect(page).to have_content('Total After Discount: $6.50')
+    end
+
+    scenario 'as a registered user i can change coupons but not select multiple' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 1'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $2')
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 2'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $1.50')
+    end
+
+    scenario 'as a registered user i cant use coupons again on different orders' do
+      user = create(:user)
+      order = create(:order, user: user, coupon_id: @dollar_off_coupon.id)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 1'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Sorry You Have Already Used That Coupon.')
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $3.00')
+    end
+
+    scenario 'as a registered user i cant use disbled coupons' do
+      disbled_coupon = create(:coupon, coupon_type: 0, value: 1, status: 1, user: @merchant)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 3'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Sorry That Coupon Does Not Exist.')
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $3.00')
+    end
+
+    scenario 'as a registered user i cant use a coupon that does not exsist' do
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'not a real coupon'
+        click_button 'Add Coupon'
+      end
+
+      expect(page).to have_content('Sorry That Coupon Does Not Exist.')
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $3.00')
+    end
+
+    scenario 'as a registered user coupons stay even when i leave the cart page' do
+      hundred_dollars_off = create(:coupon, coupon_type: 0, value: 100, user: @merchant)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 3'
+        click_button 'Add Coupon'
+      end
+      visit items_path
+      visit cart_path
+
+      expect(page).to have_content('Total: $3.00')
+      expect(page).to have_content('Total After Discount: $0')
+    end
+
+    scenario 'as a registered user i can checkout with coupons applied' do
+      hundred_dollars_off = create(:coupon, coupon_type: 0, value: 100, user: @merchant)
+      user = create(:user)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+
+      visit profile_orders_path
+      expect(page).to have_content('You have no orders yet')
+
+      visit item_path(@item)
+      click_button "Add to Cart"
+      visit cart_path
+
+      within '.coupon-code' do
+        fill_in :coupon, with: 'Coupon Name 3'
+        click_button 'Add Coupon'
+      end
+      click_button 'Check out'
+
+      expect(current_path).to eq(profile_orders_path)
+      expect(page).to have_content('You have successfully checked out!')
+      expect(page).to have_content("Order ID #{Order.last.id}")
+      click_link "Order ID #{Order.last.id}"
+
+      expect(page).to have_content("Total Cost: $3.00")
+      expect(page).to have_content("Total After Discount: $0")
+      expect(page).to have_content("Coupon Used: Coupon Name 3")
+    end
+  end
 end
 
 RSpec.describe CartController, type: :controller do
   it 'redirects back to where you came from if you try to add an invalid item id to cart' do
     item = create(:item)
-    put :add, params: {id: (item.id + 1)}
+    put :add, params: {slug: (item.id + 1)}
     expect(response.request.env['action_dispatch.request.flash_hash'].to_h['error']).to eq('Cannot add that item')
     expect(response.status).to eq(302)
     expect(response.header['Location']).to include(items_path)

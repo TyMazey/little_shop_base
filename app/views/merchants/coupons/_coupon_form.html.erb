@@ -1,0 +1,9 @@
+<%= form_for @form_path do |f| %>
+<%= f.label :name %>
+<%= f.text_field :name %>
+<%= f.label :coupon_type %>
+<%= f.select :coupon_type, options_for_select([['Dollars Off', 'dollars_off'], ['Percent Off', 'percent_off']]) %>
+<%= f.label :value %>
+<%= f.number_field :value %>
+<%= f.submit 'Save Coupon' %>
+<% end %>

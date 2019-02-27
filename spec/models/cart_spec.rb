@@ -94,4 +94,148 @@ RSpec.describe Cart do
 
     expect(cart.grand_total).to eq(cart.subtotal(item_1.id) + cart.subtotal(item_2.id))
   end
+
+  it '.add_coupon_to_cart' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.coupon).to eq("Coupon Name 1")
+  end
+
+  it '.items_for_coupon' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.items_for_coupon).to eq([item_1.id, item_2.id])
+  end
+
+  it '.items_not_for_coupon' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.items_not_for_coupon).to eq([item_3.id])
+  end
+
+  it '.subtotal_for_coupon_items' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.subtotal_for_coupon_items).to eq(7.5)
+  end
+
+  it '.non_applied_coupon_total' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.non_applied_coupon_total).to eq(6)
+  end
+
+  it '.applied_coupon_total when dollar off coupon' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.applied_coupon_total).to eq(6.5)
+  end
+
+  it '.applied_coupon_total when dollar off exeeds cart pirce is 0' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 0, value: 100, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.applied_coupon_total).to eq(0)
+  end
+
+  it '.applied_coupon_total when percent off coupon' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2, user: merchant)
+    item_3 = create(:item)
+    coupon = create(:coupon, coupon_type: 1, value: 50, user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_3.id)
+
+    cart.add_coupon_to_cart(coupon.name)
+
+    expect(cart.applied_coupon_total).to eq(3.75)
+  end
+
+  it '.discounted_total' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2,user: merchant)
+    coupon = create(:coupon, coupon_type: 0, value: 1, user: merchant)
+    cart.add_coupon_to_cart(coupon.name)
+    cart.add_item(item_1.id)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_2.id)
+
+    expect(cart.discounted_total).to eq(cart.non_applied_coupon_total + cart.applied_coupon_total)
+  end
+
+  it '.discounted_total with no coupon' do
+    cart = Cart.new({})
+    merchant = create(:merchant)
+    item_1, item_2 = create_list(:item, 2,user: merchant)
+    cart.add_item(item_1.id)
+    cart.add_item(item_1.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_2.id)
+    cart.add_item(item_2.id)
+
+    expect(cart.discounted_total).to eq(cart.grand_total)
+  end
 end

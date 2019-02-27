@@ -1,0 +1,21 @@
+<h1>Your Coupons</h1>
+<% if @coupons.count < 5 %>
+  <%= link_to 'Add New Coupon', new_dashboard_coupon_path %>
+<% else %>
+  <p>Youve reached your limit for Coupons.</p>
+<% end %>
+<section class="coupons">
+  <% @coupons.each do |c| %>
+    <div id="coupon-<%= c.id %>">
+      <p><%= c.name %></p>
+      <p><%= c.value %> <%= c.coupon_type %></p>
+      <%= link_to 'Edit Coupon', edit_dashboard_coupon_path(c) %>
+      <%= button_to 'Delete Coupon', dashboard_coupon_path(c), method: :delete %>
+      <% if c.status == 'enabled' %>
+        <%= button_to 'Disable Coupon', dashboard_disable_coupon_path(c), method: :put  %>
+      <% elsif c.status == 'disabled' %>
+        <%= button_to 'Enable Coupon', dashboard_enable_coupon_path(c), method: :put  %>
+      <% end %>
+    </div>
+  <% end %>
+</section>

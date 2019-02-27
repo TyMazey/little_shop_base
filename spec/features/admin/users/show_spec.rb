@@ -50,7 +50,7 @@ RSpec.describe 'admin user show workflow', type: :feature do
 
       updated_user = User.find_by(email: @updated_email)
 
-      expect(current_path).to eq(admin_user_path(@user))
+      expect(current_path).to eq(admin_user_path(updated_user))
       expect(page).to have_content("Profile has been updated")
       expect(page).to have_content("Name: #{@updated_name}")
       expect(page).to have_content("Email: #{@updated_email}")

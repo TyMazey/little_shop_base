@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   def build_cart
     @cart ||= Cart.new(session[:cart])
+    @cart.add_coupon_to_cart(session[:coupon])
   end
 
   def current_user
